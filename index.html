@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Any3D-VLA: Enhancing VLA Robustness via Diverse Point Clouds</title>
+  <!-- Bootstrap -->
+  <link href="css/bootstrap-4.4.1.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="css/index.css">
+  <style>
+    body {
+      background: rgb(255, 255, 255) no-repeat fixed top left;
+      font-family: 'Open Sans', sans-serif;
+    }
+  </style>
+  <style>
+    .video-wrap{
+      position: relative;
+      width: 100%;
+    }
+    .video-wrap::before{
+      content: attr(data-badge);
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      z-index: 2;
+      padding: 2px 6px;
+      font-size: 12px;
+      line-height: 1.2;
+      border-radius: 6px;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      pointer-events: none;
+    }
+    .video-wrap video{
+      display: block;
+      width: 100%;
+    }
+
+    .video-wrap .angle-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 4;
+      padding: 2px 6px;
+      font-size: 12px;
+      line-height: 1.2;
+      border-radius: 6px;
+      background: rgba(0, 123, 255, 0.85);
+      color: #fff;
+      pointer-events: none;
+    }    
+
+    .video-badge {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      z-index: 3;
+      padding: 2px 6px;
+      font-size: 12px;
+      line-height: 1.2;
+      border-radius: 6px;
+      color: #fff;
+      pointer-events: none;
+    }
+    .video-badge.success {
+      background: rgba(40, 167, 69, 0.9);
+    }
+    .video-badge.fail {
+      background: rgba(220, 53, 69, 0.9);
+    }
+  </style>
+</head>
+
+<!-- cover -->
+<section>
+  <div class="jumbotron text-center mt-0">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col">
+          <h2 style="font-size:40px;">🦾 Any3D-VLA: Enhancing VLA Robustness <br> via Diverse Point Clouds ☁️</h2>
+          <h4 style="color:#6e6e6e;"> In submission </h4>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- teaser -->
+<section>
+  <div class="container" style="width:70%" id="teaser">
+    <img src="images/teaser_figure.png" width="100%"> 
+    <p class="text-justify" style="margin:6px 0 0;">
+      Figure 1. We propose <b>Any3D-VLA</b>. It unifies simulator, sensor, and model-estimated point clouds in the training pipeline (a), enabling diverse inputs and learning domain-agnostic 3D representations that are fused with the corresponding 2D representations (b). (c) shows our experimental results in real-world settings.
+    </p>
+  </div>
+</section>
+<br>
+
+<!-- abstract -->
+<section>
+  <div class="container" style="width:70%">
+    <div class="row">
+      <div class="col-12">
+        <h2><strong>Abstract</strong></h2>
+        <hr style="margin-top:0px">
+        <p class="text-justify">
+          Existing Vision-Language-Action (VLA) models typically take 2D images as visual input, which limits their spatial understanding in complex scenes. How can we incorporate 3D information to maximize model capability gains? We conduct a pilot study across different observation spaces and visual representations. The results show that explicitly lifting visual input into point clouds yields representations that better complement their corresponding 2D representations. To address the challenges of (1) scarce 3D data and (2) the domain gap induced by cross-environment differences and depth-scale biases, we propose <b>Any3D-VLA</b>. It unifies the simulator, sensor, and model-estimated point clouds within a training pipeline, constructs diverse inputs, and learns domain-agnostic 3D representations that are fused with the corresponding 2D representations. Simulation and real-world experiments demonstrate <b>Any3D-VLA</b>'s advantages in improving performance and mitigating the domain gap.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<br>
+
+
+<br>
+<!-- post-train -->
+<section>
+  <div class="container" style="width:70%" id="post-train-video">
+    <div class="row">
+      <div class="col-12">
+        <h2><strong>Real-World Post-Training</strong></h2>
+        <hr style="margin-top:0px">   
+
+        <p class="text-justify">
+          To validate <b>Any3D-VLA</b>'s generalization capabilities on new tasks including specific rules and new language instructions, we design two challenging evaluation scenarios.
+        </p>
+        <p style="width: 100%; margin: 0 auto; border-left: 5px solid #d0d7de; padding-left: 15px; color: #57606a; text-align: justify;">
+          <b>Notations:</b> 
+          For the <b>training</b> dataset, <b><i>Setting 2</i></b> incorporates both sensor-based and point clouds estimated by multiple models, while <b><i>Setting 3</i></b> utilizes only the sensor-based point cloud. 
+          During <b>inference</b>, <b><i>RealSense</i></b> denotes the use of the sensor-based point cloud, whereas <b><i>DA3</i></b> refers to the point cloud derived from Depth Anything 3 depth predictions.
+        </p>
+        <br>
+
+        <div class="container" style="width:100%" id="post-train">
+          <p style="text-align:center;">
+              Table 1. Success rates of post-training tasks. 
+          </p>
+          <img src="images/post-train.png" width="35%" style="display:block; margin:0 auto;">
+        </div>      
+        
+        <br>
+        <h5><strong>Task 1: Grasp a flower and place it into a vase. </strong></h5>
+        <br>
+
+        <div class="row justify-content-center" style="display:flex; gap:16px; align-items:flex-start;">
+          
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="post-train-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/tulip_pi_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              pi0.5
+            </p>            
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="post-train-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/tulip_baseline_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+              <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+                GraspVLA
+              </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="post-train-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/tulip_spatialvla_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              SpatialVLA
+            </p>
+          </div>
+        </div>
+
+        <br>
+
+        <div class="row justify-content-center" style="display:flex; gap:16px; align-items:flex-start;">
+          
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="post-train-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/tulip_realsense_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (1 trial)</span>
+            </div>
+              <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+                Ours (RealSense, Setting 3)
+              </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="post-train-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/tulip_da3_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (1 trial)</span>
+            </div>
+              <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+                Ours (DA3, Setting 3)
+              </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="post-train-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/mix_tulip_realsense_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (1 trial)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (RealSense, Setting 2)
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="post-train-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/mix_tulip_da3_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (1 trial)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (DA3, Setting 2)
+            </p>
+          </div>
+        </div>
+
+        <br>
+
+        <h5><strong>Task 2: Place a transparent condiment cup into a specific slot of a cup carrier.</strong></h5>
+        <br>
+
+        <div class="row justify-content-center" style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="post-train-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/cup_pi_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              pi0.5
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="post-train-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/cup_baseline_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              GraspVLA
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="post-train-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/cup_spatialvla_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              SpatialVLA
+            </p>
+          </div>
+        </div>
+
+        <br>
+
+        <div class="row justify-content-center" style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="post-train-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/cup_realsense_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (1 trial)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (RealSense, Setting 3)
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="post-train-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/cup_da3_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (1 trial)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (DA3, Setting 3)
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="post-train-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/cup_realsense_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (2 trials)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (RealSense, Setting 2)
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="post-train-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/cup_da3_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (1 trial)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (DA3, Setting 2)
+            </p>
+          </div>
+        </div>
+
+        <br>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+<br>
+<br>
+
+<!-- zero-shot -->
+<section>
+  <div class="container" style="width:70%" id="zero-shot-video">
+    <div class="row">
+      <div class="col-12">
+        <h2><strong>Zero-Shot Comparisons in the Real World</strong></h2>
+        <hr style="margin-top:0px">
+        <p class="text-justify">
+          To evaluate <b>Any3D-VLA</b>'s zero-shot generalization ability and robustness in the real world, we design four challenging test sets.
+        </p>
+        <p style="width: 100%; margin: 0 auto; border-left: 5px solid #d0d7de; padding-left: 15px; color: #57606a; text-align: justify;">
+          <b>Notations:</b> 
+          For the <b>training</b> dataset, <b><i>Setting 1</i></b> utilizes only the simulator-based point cloud, whereas <b><i>Setting 2</i></b> incorporates both simulator-based and point clouds estimated by multiple models. 
+          During <b>inference</b>, <b><i>RealSense</i></b> denotes the use of the sensor-based point cloud, while <b><i>DA3</i></b> refers to the point cloud derived from Depth Anything 3 depth predictions.
+        </p>
+        <br>
+
+        <div class="container" style="width:100%" id="post-train">
+          <p style="text-align:center;">
+              Figure 2. Zero-shot comparisons in the real world.
+          </p>
+          <img src="images/real_world.png" width="100%" style="display:block; margin:0 auto;">
+        </div>  
+        <br>
+
+        <h5><strong>1. Standard</strong></h5>
+        <p class="text-justify">
+          Relatively simple scenes, with no more than six objects on the tabletop, and target objects mostly of conventional shapes and scales.
+        </p>
+        
+        <div class="row justify-content-center" style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/standard_duck_pi_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              pi0.5
+            </p>            
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/standard_duck_baseline_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+              <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+                GraspVLA
+              </p>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/standard_duck_spatialvla_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              SpatialVLA
+            </p>
+          </div>
+        </div>
+
+        <br>
+
+        <div class="row justify-content-center" style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/standard_duck_realsense_2_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (2 trials)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (RealSense, Setting 1)
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/standard_duck_da3_3_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (3 trials)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (DA3, Setting 1)
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/standard_duck_mix_realsense_2_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (2 trials)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (RealSense, Setting 2)
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/standard_duck_mix_da3_2_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (2 trials)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (DA3, Setting 2)
+            </p>
+          </div>
+        </div>
+        <br>
+        <h5><strong>2. Scale & Shape Challenge</strong></h5>
+        <p class="text-justify">
+          Scenes with substantial intra-class variations in size and shape, e.g., dogs and bottles of different sizes and appearances; this set also includes geometrically challenging target objects, such as elongated objects (pen, fork, spoon, etc.) and small objects (diameter &lt 3cm, e.g., bottle cap).
+        </p>
+        <div class="row justify-content-center" style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/bottle_cap_pi_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              pi0.5
+            </p>            
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/bottle_cap_baseline_2_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (2 trials)</span>
+            </div>
+              <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+                GraspVLA
+              </p>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/bottle_cap_spatialvla_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              SpatialVLA
+            </p>
+          </div>
+        </div>
+
+        <br>
+
+        <div class="row justify-content-center" style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/bottle_cap_realsense_3_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (3 trials)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (RealSense, Setting 1)
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/bottle_cap_da3_1_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (1 trial)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (DA3, Setting 1)
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/bottle_cap_mix_realsense_2_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (2 trials)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (RealSense, Setting 2)
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/bottle_cap_mix_da3_1_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (1 trial)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (DA3, Setting 2)
+            </p>
+          </div>
+        </div>
+
+        <br>
+        <h5><strong>3. Viewpoint Challenge</strong></h5>
+        <p class="text-justify">
+          While keeping the coordinate-system origin fixed, we rotate the camera viewpoint around the z-axis (perpendicular to the tabletop) by 5&deg, 15&deg, and 30&deg, respectively.
+        </p>
+        <div class="row justify-content-center" style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <span class="angle-badge">15°</span>
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/view_corn_pi_3_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (3 trials)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              pi0.5
+            </p>            
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <span class="angle-badge">15°</span>
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/view_corn_baseline_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+              <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+                GraspVLA
+              </p>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <span class="angle-badge">15°</span>
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/view_corn_spatialvla_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              SpatialVLA
+            </p>
+          </div>
+        </div>
+
+        <br>
+
+        <div class="row justify-content-center" style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <span class="angle-badge">15°</span>
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/view_corn_realsense_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (RealSense, Setting 1)
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <span class="angle-badge">15°</span>
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/view_corn_da3_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (DA3, Setting 1)
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <span class="angle-badge">15°</span>
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/view_corn_mix_realsense_3_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (3 trials)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (RealSense, Setting 2)
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <span class="angle-badge">15°</span>
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/view_corn_mix_da3_3_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (3 trials)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (DA3, Setting 2)
+            </p>
+          </div>
+        </div>
+        <br>
+
+
+        <h5><strong>4. Appearance-Deprived Challenge</strong></h5>
+        <p class="text-justify">
+          Scenes designed to weaken informative 2D cues, including transparent objects, textureless objects (solid white, solid green, solid blue, etc.), and visual camouflage (objects with the same color as the tabletop), forcing the model to rely more on 3D geometry rather than 2D color and texture information.
+        </p>
+        <div class="row justify-content-center" style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/blue_bowl_pi_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              pi0.5
+            </p>            
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/blue_bowl_baseline_fail.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge fail">Fail</span>
+            </div>
+              <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+                GraspVLA
+              </p>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/blue_bowl_spatialvla_2_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (2 trials)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              SpatialVLA
+            </p>
+          </div>
+        </div>
+
+        <br>
+
+        <div class="row justify-content-center" style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/blue_bowl_realsense_3_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (3 trials)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (RealSense, Setting 1)
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/blue_bowl_da3_1_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (1 trial)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (DA3, Setting 1)
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/blue_bowl_mix_realsense_2_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (2 trials)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (RealSense, Setting 2)
+            </p>
+          </div>
+
+          <div style="display:flex; flex-direction:column; align-items:center; width:20%;">
+            <div class="video-wrap" data-badge="2×">
+              <video class="zero-shot-video" autobuffer muted autoplay loop playsinline style="width:100%;">
+                <source src="videos/blue_bowl_mix_da3_1_suc.mp4" type="video/mp4">
+              </video>
+              <span class="video-badge success">Success (1 trial)</span>
+            </div>
+            <p class="text-justify" style="margin:6px 0 0; text-align:center;">
+              Ours (DA3, Setting 2)
+            </p>
+          </div>
+        </div>
+        <br>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+<br>
+
+
+<!-- <section>
+  <div class="container" style="width:70%" id="zero-shot-video">
+    <div class="row">
+      <div class="col-12">
+        <h2><strong> </strong></h2>
+        <hr style="margin-top:0px">
+        <p class="text-justify">
+        </p>
+        <direct class="row justify-content-center" style="align-items:center; display:flex">
+        <video id="zero-shot-video" autobuffer muted autoplay loop controls width="90%">
+          <source src="videos/simdata.mp4" type="video/mp4">
+        </video>
+        
+        <p class="text-justify">
+        </p>
+        <div class="container" style="width:90%" id="teaser">
+          <img src="images/datagen.png" width="100%"> 
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+<br>
+<br> -->
+
+
+<!-- Model Architecture -->
+<!-- <section>
+  <div class="container" style="width:70%" id="zero-shot-video">
+    <div class="row">
+      <div class="col-12">
+        <h2><strong>Model</strong></h2>
+        <hr style="margin-top:0px">        
+        <p class="text-justify">
+        </p>
+        <div class="container" style="width:90%" id="teaser">
+          <img src="images/pipeline.png" width="100%"> 
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+<br> -->
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const rate = 2.0;
+    document.querySelectorAll("video.post-train-video").forEach((v) => {
+      v.playbackRate = rate;
+      v.addEventListener("loadedmetadata", () => {
+        v.playbackRate = rate;
+      });
+      v.addEventListener("play", () => {
+        if (v.playbackRate !== rate) v.playbackRate = rate;
+      });
+    });
+  });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const rate = 2.0;
+    document.querySelectorAll("video.zero-shot-video").forEach((v) => {
+      v.playbackRate = rate;
+      v.addEventListener("loadedmetadata", () => {
+        v.playbackRate = rate;
+      });
+      v.addEventListener("play", () => {
+        if (v.playbackRate !== rate) v.playbackRate = rate;
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
