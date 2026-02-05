@@ -1,0 +1,17 @@
+# Any3D-VLA: Project Page & Supplementary Material
+
+## Instructions
+This folder contains the interactive project page for **Any3D-VLA**.
+
+To view the results, please **double-click the `index.html` file**. This will launch the offline website in your default web browser.
+
+## Content Overview
+The webpage provides a comprehensive gallery of our experiments, specifically highlighting:
+
+1.  **Post-training Visualizations:** Results and video rollouts showcasing the model's performance improvements following the post-training phase.
+
+2.  **Real-world Zero-shot Evaluation:** Video demonstrations showing Any3D-VLA's capability to generalize to real-world tasks in a zero-shot manner.
+
+## System Requirements
+* No internet connection is required to view the content.
+* Compatible with modern browsers (Chrome, Edge, Safari, Firefox).

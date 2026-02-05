@@ -154,6 +154,42 @@
 </section>
 <br>
 
+<section>
+  <div class="container" style="width:70%">
+    <div class="row">
+      <div class="col-12">
+        <h2><strong>Pilot Study: Native Sparse Point Representations Matter❗️</strong></h2>
+        <hr style="margin-top:0px">
+        <p class="text-justify">
+          For VLA tasks, we compare five different approaches: all start from the same world state but construct observations through different perception and processing pipelines, differing in how explicitly geometric information is provided and how it is represented.
+        </p>
+        <div class="container" style="width:100%" id="pilot">
+          <p style="text-align:center;">
+              Figure 2. Different observation spaces and visual representations.
+          </p>
+          <img src="images/observation_space.png" width="100%" style="display:block; margin:0 auto;">
+        </div>
+        <br>
+        <p class="text-justify">
+          As shown in Table 1, the point cloud-2D patch fusion paradigm achieves the best performance. Notably, even in simulation with perfect depth, directly feeding depth as an additional image channel, or injecting implicit and reconstruction-based spatial priors via models such as VGGT, yields relatively limited gains. 
+          The potential reason for this is that implicit methods (such as VGGT or depth-pretrained encoders) rely on reconstruction objectives to learn spatial features; consequently, they often lack precise metric alignment and are prone to spatial hallucinations during fine-grained manipulation. Conversely, regarding methods that directly input depth maps: while they introduce explicit depth, treating it as a 2D channel input compromises the inherent topological structure of the 3D data. 2D backbones struggle to effectively infer occlusion relationships and absolute scales from flattened depth maps.
+        </p>
+        <div class="container" style="width:100%" id="pilot">
+          <p style="text-align:center;">
+              Table 1. Comparison of different observation spaces and visual representations in the simulator. 'Single-Trial SR' denotes success on the first attempt, 'Test SR' within three attempts, and 'Grasp SR' for grasping any object.
+          </p>
+          <img src="images/pilot_study.png" width="35%" style="display:block; margin:0 auto;">
+        </div>
+        <br>
+        <p class="text-justify">
+          This suggests that the key to performance improvements is not whether depth is provided, but how the geometric information carried by depth is represented and exploited. Rather than encoding geometric cues on the image plane, fusing native sparse 3D structure (i.e., compressed point clouds) with the corresponding 2D patch representations provides more direct and more stable spatial constraints and interaction geometry required for manipulation.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<br>
+
 
 <br>
 <!-- post-train -->
@@ -176,7 +212,7 @@
 
         <div class="container" style="width:100%" id="post-train">
           <p style="text-align:center;">
-              Table 1. Success rates of post-training tasks. 
+              Table 2. Success rates of post-training tasks. 
           </p>
           <img src="images/post-train.png" width="35%" style="display:block; margin:0 auto;">
         </div>      
@@ -400,7 +436,7 @@
 
         <div class="container" style="width:100%" id="post-train">
           <p style="text-align:center;">
-              Figure 2. Zero-shot comparisons in the real world.
+              Figure 3. Zero-shot comparisons in the real world.
           </p>
           <img src="images/real_world.png" width="100%" style="display:block; margin:0 auto;">
         </div>  
