@@ -116,10 +116,13 @@
                 <p class="mb-5"><a class="btn btn-large btn-light" href="https://huggingface.co/XianzheFan/Any3D-VLA" role="button" target="_blank" disabled=1 style="background-color: #d3d3d3d2;color: black">
                 <i class="fa fa-github-alt"></i>Checkpoint</a></p>
               </div>
-              <!-- <div class="column">
-                <p class="mb-5"><a class="btn btn-large btn-light" role="button" target="_blank" disabled=1 style="background-color: #d3d3d3d2;color: black">
-                <i class="fa fa-github-alt"></i>Dataset (Coming Soon)</a></p>
-              </div> -->
+              <div class="column">
+                <p class="mb-5">
+                  <a class="btn btn-large btn-light" id="cite-btn" href="javascript:void(0);" onclick="copyBibtex()" role="button" style="background-color: #d3d3d3d2;color: black;">
+                    <i class="fa fa-quote-right"></i> BibTeX 📖
+                  </a>
+                </p>
+              </div>
             </div>
         </div>
       </div>
@@ -903,6 +906,33 @@
       });
     });
   });
+</script>
+
+<script>
+  function copyBibtex() {
+    const bibtexText = `@article{fan2026any3d,
+  title={Any3D-VLA: Enhancing VLA Robustness via Diverse Point Clouds},
+  author={Fan, Xianzhe and Deng, Shengliang and Wu, Xiaoyang and Lu, Yuxiang and Li, Zhuoling and Yan, Mi and Zhang, Yujia and Zhang, Zhizheng and Wang, He and Zhao, Hengshuang},
+  journal={arXiv preprint arXiv:2602.00807},
+  year={2026}
+}`;
+
+    navigator.clipboard.writeText(bibtexText).then(() => {
+      const btn = document.getElementById("cite-btn");
+      const originalContent = btn.innerHTML; 
+      btn.innerHTML = '<i class="fa fa-check"></i> Copied!';
+      btn.style.color = "#28a745";
+      btn.style.borderColor = "#28a745";
+
+      setTimeout(() => {
+        btn.innerHTML = originalContent;
+        btn.style.color = "black";
+        btn.style.borderColor = "";
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
+  }
 </script>
 
 </body>
